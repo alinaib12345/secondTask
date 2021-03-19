@@ -1,5 +1,4 @@
 import java.io.*;
-import java.util.zip.*;
 
 public class PackRle {
 
@@ -53,11 +52,12 @@ public class PackRle {
     public void packRle() {
         try {
             File inputFile = new File(inputName);
+            File fileToWrite = new File("fileToWrite.txt");
             FileReader reader = new FileReader(inputFile);
             BufferedReader br = new BufferedReader(reader);
             FileWriter fw;
             if (outputName != null) fw = new FileWriter(outputName);
-            else  fw = new FileWriter(inputFile);
+            else  fw = new FileWriter(fileToWrite);
             BufferedWriter bw = new BufferedWriter(fw);
             String newString;
             for (String line; (line = br.readLine()) != null;) {
@@ -66,6 +66,10 @@ public class PackRle {
                 } else newString = unpacking(line);
                 bw.write(newString);
                 bw.newLine();
+            }
+            if (outputName == null) {
+                inputFile.delete();
+                fileToWrite.renameTo(inputFile);
             }
             if (pack) System.out.println("Pack-rle: pack successful");
             else System.out.println("Pack-rle: unpack successful");
