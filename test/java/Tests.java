@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Tests {
     private boolean assertFileContent(String expectedFile, String actualFile) {
@@ -22,14 +23,24 @@ public class Tests {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < actual.size(); i++){
-            if (expected.get(i) != actual.get(i)) return false;
+        assert expected != null;
+        for (int i = 0; i < (actual != null ? actual.size() : 0); i++){
+            if (!expected.get(i).equals(actual.get(i))) return false;
         }
+        assert actual != null;
         return expected.size() == actual.size();
     }
 
     @Test
-    public void pack () {
+    public void packRle() {
+        PackLauncher.main("Pack-rle -z test/resources/inputFile.txt".split(" "));
+        assertTrue (assertFileContent("test/resources/outputFile.txt", "test/resources/inputFile.txt"));
+
+
+    }
+
+    @Test
+    public void pack() {
        assertEquals("5A7O4Y10M9P",  PackRle.packing("AAAAAOOOOOOOYYYYMMMMMMMMMMPPPPPPPPP"));
         assertEquals("DBAEFDBAFDABFDBAEDFABEDFAEBDFEABDFABED2FAD31BAEB2DBAEBDF",
                 PackRle.packing("DBAEFDBAFDABFDBAEDFABEDFAEBDFEABDFABEDFFADBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBAEBDDBAEBDF"));
@@ -37,7 +48,7 @@ public class Tests {
     }
 
     @Test
-    public void unpack () {
+    public void unpack() {
         assertEquals("AAAAAOOOOOOOYYYYMMMMMMMMMMPPPPPPPPP", PackRle.unpacking("5A7O4Y10M9P"));
         assertEquals("DBAEFDBAFDABFDBAEDFABEDFAEBDFEABDFABEDFFADBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBAEBDDBAEBDF",
                 PackRle.unpacking("DBAEFDBAFDABFDBAEDFABEDFAEBDFEABDFABED2FAD31BAEB2DBAEBDF"));

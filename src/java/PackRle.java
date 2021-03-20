@@ -60,7 +60,7 @@ public class PackRle {
             FileReader reader = new FileReader(inputFile);
             BufferedReader br = new BufferedReader(reader);
             FileWriter fw;
-            if (outputName != "") fw = new FileWriter(outputName);
+            if (!outputName.equals("")) fw = new FileWriter(outputName);
             else  fw = new FileWriter(fileToWrite);
             BufferedWriter bw = new BufferedWriter(fw);
             String newString;
@@ -71,7 +71,7 @@ public class PackRle {
                 bw.write(newString);
                 bw.newLine();
             }
-            if (outputName == "") {
+            if (outputName.equals("")) {
                 inputFile.delete();
                 fileToWrite.renameTo(inputFile);
             }
