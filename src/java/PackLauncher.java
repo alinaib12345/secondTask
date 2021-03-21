@@ -11,8 +11,8 @@ public final class PackLauncher {
     @Option(name = "-u", usage = "unpacking file", forbids = {"-z"})
     private boolean unpack = false;
 
-    @Option(name = "-out", usage = "output to this file (default: inputname.txt)")
-    private static String outputName = "";
+    @Option(name = "-out", usage = "output to this file")
+    private static String outputName;
 
     @Argument
     private List<String> arguments = new ArrayList<String>();
@@ -26,7 +26,7 @@ public final class PackLauncher {
 
         try {
             parser.parseArgument(args);
-            if ((!pack && !unpack) || (pack && unpack) || !arguments.get(0).equals("Pack-rle")) {
+            if ((!pack && !unpack) || (pack && unpack) || !arguments.get(0).equals("Pack-rle") || arguments.size() != 2) {
                 System.err.println("Error entering arguments");
                 throw new IllegalArgumentException("Illegal arguments");
             }
