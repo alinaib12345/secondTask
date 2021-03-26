@@ -36,13 +36,10 @@ public final class PackLauncher {
         if (outputName == null)
             outputName = inputName + ".rle";
         PackRle packer = new PackRle(inputName, outputName);
-        try {
-            if (pack) packer.packing(inputName, outputName);
-            else packer.unpacking(inputName, outputName);
-            System.out.println(pack ? "Pack successful" : "Unpack successful");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        if (pack) packer.packing(inputName, outputName);
+        else packer.unpacking(inputName, outputName);
+        System.out.println(pack ? "Pack successful" : "Unpack successful");
     }
 
 }

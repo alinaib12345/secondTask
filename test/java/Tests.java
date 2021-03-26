@@ -15,6 +15,8 @@ public class Tests {
         PackLauncher.main(("-z test/resources/input1.txt").split(" "));
         PackLauncher.main(("-u test/resources/input1.txt.rle").split(" "));
         PackLauncher.main(("-z test/resources/input2.txt").split(" "));
+        PackLauncher.main(("-u test/resources/oneByte.txt").split(" "));
+        PackLauncher.main(("-u test/resources/oneByte.txt.rle").split(" "));
     }
     @Test
     public void packRle1() throws IOException {

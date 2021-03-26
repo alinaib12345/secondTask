@@ -22,59 +22,72 @@ public class PackRle {
                  int repetitiveCount = -1;
                  int notRepetitiveCount = 0;
                  byte previous = 0;
-                 if (in.available() != 0) {
+                 boolean oneByte = false;
+                 if (in.available() == 1) {
+                     out.writeByte(in.readByte());
+                     oneByte = true;
+
+                 }
+                 if (in.available() > 1) {
                      previous = in.readByte();
                  }
                  byte current;
+                 boolean repetitive = false;
+                 boolean afterNotRepetitive = false;
+                 boolean afterRepetitive = false;
                  ArrayList<Byte> bytes = new ArrayList<>();
                  while (in.available() > 0) {
                      current = in.readByte();
                      if (previous == current) {
-                         if (notRepetitiveCount != 0) {
+                         repetitive = true;
+                         repetitiveCount--;
+                         if (notRepetitiveCount != 0)  afterNotRepetitive = true;
+                     }
+                     if (previous != current) {
+                         repetitive = false;
+                         if (repetitiveCount != -1) afterRepetitive = true;
+                     }
+                     if (repetitive && afterNotRepetitive) {
+                         out.writeByte(notRepetitiveCount);
+                         for (byte el : bytes) out.writeByte(el);
+                         bytes.clear();
+                         notRepetitiveCount = 0;
+                     }
+                     if (repetitive && repetitiveCount == -128) {
+                         out.writeByte(repetitiveCount);
+                         out.writeByte(previous);
+                         repetitiveCount = -1;
+                         previous = in.readByte();
+                         continue;
+                     }
+                     if (afterRepetitive && !repetitive) {
+                         out.writeByte(repetitiveCount);
+                         out.writeByte(previous);
+                         repetitiveCount = -1;
+                         previous = current;
+                         continue;
+                     }
+                     if (!repetitive) {
+                         notRepetitiveCount++;
+                         bytes.add(previous);
+                         if (notRepetitiveCount == 127) {
                              out.writeByte(notRepetitiveCount);
                              for (byte el : bytes) out.writeByte(el);
                              bytes.clear();
                              notRepetitiveCount = 0;
-                         }
-                         repetitiveCount--;
-                         if (repetitiveCount == -128) {
-                             out.writeByte(repetitiveCount);
-                             out.writeByte(previous);
-                             repetitiveCount = -1;
-                             previous = in.readByte();
-                             continue;
-                         }
-                     }
-                     if (previous != current) {
-                         if (repetitiveCount != -1) {
-                             out.writeByte(repetitiveCount);
-                             out.writeByte(previous);
-                             repetitiveCount = -1;
                              previous = current;
                              continue;
-                         } else {
-                             notRepetitiveCount++;
-                             bytes.add(previous);
-                             if (notRepetitiveCount == 127) {
-                                 out.writeByte(notRepetitiveCount);
-                                 for (byte el : bytes) out.writeByte(el);
-                                 bytes.clear();
-                                 notRepetitiveCount = 0;
-                                 previous = current;
-                                 continue;
-                             }
-
                          }
-
                      }
                      previous = current;
                  }
-                 if (notRepetitiveCount != 0) {
+                 if (repetitiveCount != -1) {
+                     out.writeByte(repetitiveCount);
+                     out.writeByte(previous);
+                 }else if (notRepetitiveCount >= 0 && !oneByte) {
                      out.writeByte(notRepetitiveCount + 1);
                      for (byte el: bytes) out.writeByte(el);
-                     out.writeByte(previous);
-                 } else if (repetitiveCount < -1) {
-                     out.writeByte(repetitiveCount);
+                     bytes.clear();
                      out.writeByte(previous);
                  }
              }
@@ -88,6 +101,7 @@ public class PackRle {
      public static void unpacking (String inputName, String outputName) {
          try (DataInputStream in = new DataInputStream(new FileInputStream(inputName))){
                  try (DataOutputStream out = new DataOutputStream(new FileOutputStream(outputName))) {
+                     if (in.available() == 1) out.writeByte(in.readByte());
                      while (in.available() > 0) {
                          byte length = in.readByte();
                          if (length < 0) {
