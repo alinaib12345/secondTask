@@ -43,4 +43,12 @@ public class Tests {
         assertTrue(FileUtils.contentEquals(expected, actual));
     }
 
+    @Test
+    public void packRle4() throws IOException {
+        PackRle.packing("test/resources/numbers.txt","test/resources/rletest4.txt");
+        PackRle.unpacking("test/resources/rletest4.txt","test/resources/outputnumbers.txt");
+        File expected = new File("test/resources/numbers.txt");
+        File actual = new File("test/resources/outputnumbers.txt");
+        assertTrue(FileUtils.contentEquals(expected, actual));
+    }
 }
