@@ -86,8 +86,10 @@ public class PackRle {
                      out.writeByte(previous);
                  }else if (notRepetitiveCount >= 0 && !oneByte) {
                      out.writeByte(notRepetitiveCount + 1);
-                     for (byte el: bytes) out.writeByte(el);
-                     bytes.clear();
+                     if (!bytes.isEmpty()){
+                         for (byte el: bytes) out.writeByte(el);
+                         bytes.clear();
+                     }
                      out.writeByte(previous);
                  }
              }
