@@ -1,146 +1,46 @@
-
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.io.File;
+import java.io.IOException;
+
+import static org.junit.Assert.assertTrue;
 
 public class Tests {
 
     @Test
     public void packRle() {
-        PackLauncher.main(("Pack-rle -z -out test/resources/outputFile.txt test/resources/inputFile.txt").split(" "));
-        PackLauncher.main(("Pack-rle -u test/resources/simpleOutput.txt").split(" "));
-        PackLauncher.main(("Pack-rle -z test/resources/inputFile.txt").split(" "));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            PackLauncher.main(("Pack-rle -u").split(" "));
-            PackLauncher.main(("Pack-rle -u -z").split(" "));
-            PackLauncher.main(("Pack-rle").split(" "));
-            PackLauncher.main((" ").split(" "));
-        });
-
+        PackLauncher.main(("-z -out test/resources/output.txt test/resources/input.txt").split(" "));
+        PackLauncher.main(("-u test/resources/output.txt").split(" "));
+        PackLauncher.main(("-z test/resources/input1.txt").split(" "));
+        PackLauncher.main(("-u test/resources/input1.txt.rle").split(" "));
+        PackLauncher.main(("-z test/resources/input2.txt").split(" "));
+    }
+    @Test
+    public void packRle1() throws IOException {
+        PackRle.packing("test/resources/input1.txt","test/resources/rletest.txt");
+        PackRle.unpacking("test/resources/rletest.txt","test/resources/output1.txt");
+        File expected = new File("test/resources/input1.txt");
+        File actual = new File("test/resources/output1.txt");
+        assertTrue(FileUtils.contentEquals(expected, actual));
     }
 
     @Test
-    public void pack() {
-       assertEquals("5A7O4Y10M9P",  PackRle.packing("AAAAAOOOOOOOYYYYMMMMMMMMMMPPPPPPPPP"));
-        assertEquals("DBAEFDBAFDABFDBAEDFABEDFAEBDFEABDFABED2FAD31BAEB2DBAEBDF",
-                PackRle.packing("DBAEFDBAFDABFDBAEDFABEDFAEBDFEABDFABEDFFADBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBAEBDDBAEBDF"));
-        assertEquals("7j7O5T4n10I6N",  PackRle.packing("jjjjjjjOOOOOOOTTTTTnnnnIIIIIIIIIINNNNNN"));
-        assertEquals("А судьи кто? – За древностию лет " +
-                "К свободно3й ж3изни их вражд3а непримир5има, " +
-                "Сужденья черпают из забыт2ых газет Времен Очаковских и покоренья Крыма; " +
-                "Всегда готовые к журьбе, По2ют всё песнь одну и ту же, " +
-                "Не замечая об себе: Что стар2е, то хуже. " +
-                "Где, укажите нам, отечества отцы, Которых мы должны принять за образцы? " +
-                "Не эти ли, грабительством богаты? " +
-                "Защиту от суда в друз3ьях нашли, " +
-                "в родстве, Великолепные с2орудя палаты, " +
-                "Где разливаются в пирах и мотовстве " +
-                "И где не воскрес3ят клиенты‑иностранцы " +
-                "Прошедшего житья подлейшие черты. " +
-                "Да и кому в Москве не зажимали рты Обеды, ужины и танцы? " +
-                "Не тот ли вы, к кому меня еще с пелён, " +
-                "Для замыслов как4их‑то непонятных, " +
-                "Дитёй возили на покл3он?" +
-                "Тот Нестор негодяев знатных, " +
-                "Толпою окруже2ный слуг;" +
-                "Усердствуя, он3и в часы вина и драки " +
-                "И честь и ж3изнь его не раз спасали: вдруг" +
-                "На них он выменил борзые три собаки3! " +
-                "Или вон тот ещ3е, который для затей " +
-                "На крепостной балет согн2ал на многих фурах " +
-                "От матерей, отцов о2торже2ных детей?! " +
-                "Сам погружен умом в Зефирах и в Амурах, " +
-                "Заставил всю Москву дивиться их красе5!",
-                PackRle.packing(
-                "А судьи кто? – За древностию лет " +
-                "К свободноййй жииизни их враждааа непримирииииима, " +
-                "Сужденья черпают из забытыых газет Времен Очаковских и покоренья Крыма; " +
-                "Всегда готовые к журьбе, Поюют всё песнь одну и ту же, " +
-                "Не замечая об себе: Что старее, то хуже. " +
-                "Где, укажите нам, отечества отцы, Которых мы должны принять за образцы? " +
-                "Не эти ли, грабительством богаты? " +
-                "Защиту от суда в друзьььях нашли, " +
-                "в родстве, Великолепные соорудя палаты, " +
-                "Где разливаются в пирах и мотовстве " +
-                "И где не воскресяяят клиенты‑иностранцы " +
-                "Прошедшего житья подлейшие черты. " +
-                "Да и кому в Москве не зажимали рты Обеды, ужины и танцы? " +
-                "Не тот ли вы, к кому меня еще с пелён, " +
-                "Для замыслов какиииих‑то непонятных, " +
-                "Дитёй возили на поклооон?" +
-                "Тот Нестор негодяев знатных, " +
-                "Толпою окруженный слуг;" +
-                "Усердствуя, ониии в часы вина и драки " +
-                "И честь и жииизнь его не раз спасали: вдруг" +
-                "На них он выменил борзые три собаки!!! " +
-                "Или вон тот ещеее, который для затей " +
-                "На крепостной балет согнаал на многих фурах " +
-                "От матерей, отцов отторженных детей?! " +
-                "Сам погружен умом в Зефирах и в Амурах, " +
-                "Заставил всю Москву дивиться их красе!!!!!"
-               ));
+    public void packRle2() throws IOException {
+        PackRle.packing("test/resources/input2.txt","test/resources/rletest2.txt");
+        PackRle.unpacking("test/resources/rletest2.txt","test/resources/output2.txt");
+        File expected = new File("test/resources/input2.txt");
+        File actual = new File("test/resources/output2.txt");
+        assertTrue(FileUtils.contentEquals(expected, actual));
     }
 
     @Test
-    public void unpack() {
-        assertEquals("AAAAAOOOOOOOYYYYMMMMMMMMMMPPPPPPPPP", PackRle.unpacking("5A7O4Y10M9P"));
-        assertEquals("DBAEFDBAFDABFDBAEDFABEDFAEBDFEABDFABEDFFADBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBAEBDDBAEBDF",
-                PackRle.unpacking("DBAEFDBAFDABFDBAEDFABEDFAEBDFEABDFABED2FAD31BAEB2DBAEBDF"));
-        assertEquals("hhhhhhhOOOOOOOTTTTTeeeeIIIIIIIIIINNNNNN",  PackRle.unpacking("7h7O5T4e10I6N"));
-        assertEquals("А судьи кто? – За древностию лет " +
-                "К свободноййй жииизни их враждааа непримирииииима, " +
-                "Сужденья черпают из забытыых газет Времен Очаковских и покоренья Крыма; " +
-                "Всегда готовые к журьбе, Поюют всё песнь одну и ту же, " +
-                "Не замечая об себе: Что старее, то хуже. " +
-                "Где, укажите нам, отечества отцы, Которых мы должны принять за образцы? " +
-                "Не эти ли, грабительством богаты? " +
-                "Защиту от суда в друзьььях нашли, " +
-                "в родстве, Великолепные соорудя палаты, " +
-                "Где разливаются в пирах и мотовстве " +
-                "И где не воскресяяят клиенты‑иностранцы " +
-                "Прошедшего житья подлейшие черты. " +
-                "Да и кому в Москве не зажимали рты Обеды, ужины и танцы? " +
-                "Не тот ли вы, к кому меня еще с пелён, " +
-                "Для замыслов какиииих‑то непонятных, " +
-                "Дитёй возили на поклооон?" +
-                "Тот Нестор негодяев знатных, " +
-                "Толпою окруженный слуг;" +
-                "Усердствуя, ониии в часы вина и драки " +
-                "И честь и жииизнь его не раз спасали: вдруг" +
-                "На них он выменил борзые три собаки!!! " +
-                "Или вон тот ещеее, который для затей " +
-                "На крепостной балет согнаал на многих фурах " +
-                "От матерей, отцов отторженных детей?! " +
-                "Сам погружен умом в Зефирах и в Амурах, " +
-                "Заставил всю Москву дивиться их красе!!!!!",
-                PackRle.unpacking(
-                "А судьи кто? – За древностию лет " +
-                "К свободно3й ж3изни их вражд3а непримир5има, " +
-                "Сужденья черпают из забыт2ых газет Времен Очаковских и покоренья Крыма; " +
-                "Всегда готовые к журьбе, По2ют всё песнь одну и ту же, " +
-                "Не замечая об себе: Что стар2е, то хуже. " +
-                "Где, укажите нам, отечества отцы, Которых мы должны принять за образцы? " +
-                "Не эти ли, грабительством богаты? " +
-                "Защиту от суда в друз3ьях нашли, " +
-                "в родстве, Великолепные с2орудя палаты, " +
-                "Где разливаются в пирах и мотовстве " +
-                "И где не воскрес3ят клиенты‑иностранцы " +
-                "Прошедшего житья подлейшие черты. " +
-                "Да и кому в Москве не зажимали рты Обеды, ужины и танцы? " +
-                "Не тот ли вы, к кому меня еще с пелён, " +
-                "Для замыслов как4их‑то непонятных, " +
-                "Дитёй возили на покл3он?" +
-                "Тот Нестор негодяев знатных, " +
-                "Толпою окруже2ный слуг;" +
-                "Усердствуя, он3и в часы вина и драки " +
-                "И честь и ж3изнь его не раз спасали: вдруг" +
-                "На них он выменил борзые три собаки3! " +
-                "Или вон тот ещ3е, который для затей " +
-                "На крепостной балет согн2ал на многих фурах " +
-                "От матерей, отцов о2торже2ных детей?! " +
-                "Сам погружен умом в Зефирах и в Амурах, " +
-                "Заставил всю Москву дивиться их красе5!"));
+    public void packRle3() throws IOException {
+        PackRle.packing("test/resources/input.txt","test/resources/rletest3.txt");
+        PackRle.unpacking("test/resources/rletest3.txt","test/resources/output.txt");
+        File expected = new File("test/resources/input.txt");
+        File actual = new File("test/resources/output.txt");
+        assertTrue(FileUtils.contentEquals(expected, actual));
     }
 
 }

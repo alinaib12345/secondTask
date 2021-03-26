@@ -1,21 +1,22 @@
-import org.kohsuke.args4j.*;
-import java.util.ArrayList;
-import java.util.List;
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
 
 
 public final class PackLauncher {
 
-    @Option(name = "-z", usage = "packing file", forbids = {"-u"})
+    @Option(name = "-z", usage = "Packing", forbids = {"-u"})
     private boolean pack = false;
 
-    @Option(name = "-u", usage = "unpacking file", forbids = {"-z"})
+    @Option(name = "-u", usage = "Unpacking", forbids = {"-z"})
     private boolean unpack = false;
 
-    @Option(name = "-out", usage = "output to this file")
+    @Option(name = "-out", usage = "Output to this file")
     private static String outputName;
 
-    @Argument
-    private List<String> arguments = new ArrayList<String>();
+    @Argument(required = true, usage = "InputName")
+    private String inputName;
 
     public static void main(String[] args) {
         new PackLauncher().launch(args);
@@ -26,16 +27,22 @@ public final class PackLauncher {
 
         try {
             parser.parseArgument(args);
-            if ((!pack && !unpack) || (pack && unpack) || !arguments.get(0).equals("Pack-rle") || arguments.size() != 2) {
-                System.err.println("Error entering arguments");
-                throw new IllegalArgumentException("Illegal arguments");
-            }
         } catch (CmdLineException e) {
             System.err.println(e.getMessage());
+            System.err.println("java - jar pack-rle -z Packing -u Unpacking -out Output to this file InputName");
+            parser.printUsage(System.err);
+            return;
         }
-        String input = arguments.get(1);
-        PackRle packRle = new PackRle(pack, input, outputName);
-        packRle.packRle();
+        if (outputName == null)
+            outputName = inputName + ".rle";
+        PackRle packer = new PackRle(inputName, outputName);
+        try {
+            if (pack) packer.packing(inputName, outputName);
+            else packer.unpacking(inputName, outputName);
+            System.out.println(pack ? "Pack successful" : "Unpack successful");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
