@@ -35,9 +35,10 @@ public final class PackLauncher {
         }
         if (outputName == null) {
             if (pack) outputName = inputName + ".rle";
-            else
-                if (outputName.matches(".rle")) outputName = inputName.substring(0,outputName.length() - 4);
+            else {
+                if (outputName.matches(".rle")) outputName = inputName.substring(0, outputName.length() - 4);
                 else outputName = inputName + ".rle";
+            }
         }
         PackRle packer = new PackRle(inputName, outputName);
         if (pack) packer.packing(inputName, outputName);
