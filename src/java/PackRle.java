@@ -23,6 +23,11 @@ public class PackRle {
                  int notRepetitiveCount = 0;
                  byte previous = 0;
                  boolean oneByte = false;
+                 byte current;
+                 boolean repetitive = false;
+                 boolean afterNotRepetitive = false;
+                 boolean afterRepetitive = false;
+                 ArrayList<Byte> bytes = new ArrayList<>();
                  if (in.available() == 1) {
                      out.writeByte(in.readByte());
                      oneByte = true;
@@ -31,11 +36,6 @@ public class PackRle {
                  if (in.available() > 1) {
                      previous = in.readByte();
                  }
-                 byte current;
-                 boolean repetitive = false;
-                 boolean afterNotRepetitive = false;
-                 boolean afterRepetitive = false;
-                 ArrayList<Byte> bytes = new ArrayList<>();
                  while (in.available() > 0) {
                      current = in.readByte();
                      if (previous == current) {
@@ -47,37 +47,25 @@ public class PackRle {
                          repetitive = false;
                          if (repetitiveCount != -1) afterRepetitive = true;
                      }
-                     if (repetitive && afterNotRepetitive) {
-                         out.writeByte(notRepetitiveCount);
-                         for (byte el : bytes) out.writeByte(el);
-                         bytes.clear();
-                         notRepetitiveCount = 0;
-                     }
-                     if (repetitive && repetitiveCount == -128) {
+                     if (repetitive && repetitiveCount == -128 || afterRepetitive && !repetitive) {
                          out.writeByte(repetitiveCount);
                          out.writeByte(previous);
                          repetitiveCount = -1;
-                         previous = in.readByte();
-                         continue;
-                     }
-                     if (afterRepetitive && !repetitive) {
-                         out.writeByte(repetitiveCount);
-                         out.writeByte(previous);
-                         repetitiveCount = -1;
-                         previous = current;
+                         if (repetitive) previous = in.readByte();
+                         else previous = current;
                          continue;
                      }
                      if (!repetitive) {
                          notRepetitiveCount++;
                          bytes.add(previous);
-                         if (notRepetitiveCount == 127) {
-                             out.writeByte(notRepetitiveCount);
-                             for (byte el : bytes) out.writeByte(el);
-                             bytes.clear();
-                             notRepetitiveCount = 0;
-                             previous = current;
-                             continue;
-                         }
+                     }
+                     if (repetitive && afterNotRepetitive || notRepetitiveCount == 127 && !repetitive) {
+                         out.writeByte(notRepetitiveCount);
+                         for (byte el : bytes) out.writeByte(el);
+                         bytes.clear();
+                         notRepetitiveCount = 0;
+                         previous = current;
+                         continue;
                      }
                      previous = current;
                  }

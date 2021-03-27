@@ -33,10 +33,14 @@ public final class PackLauncher {
             parser.printUsage(System.err);
             return;
         }
-        if (outputName == null)
-            outputName = inputName + ".rle";
+        if (outputName == null) {
+            if (pack) outputName = inputName + ".rle";
+            else {
+                if (outputName.matches(".rle")) outputName = inputName.substring(0,outputName.length() - 4);
+                else if (pack) outputName = inputName + ".rle";
+            }
+        }
         PackRle packer = new PackRle(inputName, outputName);
-
         if (pack) packer.packing(inputName, outputName);
         else packer.unpacking(inputName, outputName);
         System.out.println(pack ? "Pack successful" : "Unpack successful");
